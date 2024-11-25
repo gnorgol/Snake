@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
     public int highScore = 0;
     public TMP_Text scoreText;
     public TMP_Text highScoreText;
+    public bool isGameStarted = false;
+    public Button startButton;
 
     private void Awake()
     {
@@ -18,11 +20,14 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
 
         highScore = PlayerPrefs.GetInt("HighScore", 0);
+        startButton.onClick.AddListener(StartGame);
     }
 
-    private void Start()
+    private void StartGame()
     {
+        isGameStarted = true;
         UpdateUI();
+        startButton.gameObject.SetActive(false);
     }
 
     public void AddScore(int value)

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Snake : MonoBehaviour
 {
@@ -9,10 +10,21 @@ public class Snake : MonoBehaviour
     private List<Transform> segments = new List<Transform>();
     public Transform segmentPrefab;
     public FoodSpawner foodSpawner;
+    public InputActionReference MoveAction;
 
     // Position de grille actuelle du serpent
     private int currentX;
     private int currentY;
+
+    private void OnEnable()
+    {
+        MoveAction.action.Enable();
+    }
+
+    private void OnDisable()
+    {
+        MoveAction.action.Disable();
+    }
 
     private void Start()
     {
@@ -28,24 +40,29 @@ public class Snake : MonoBehaviour
 
     private void Update()
     {
-        HandleInput();
-        timer += Time.deltaTime;
-        if (timer >= moveRate)
+        if (GameManager.instance.isGameStarted)
         {
-            Move();
-            timer = 0;
+            HandleInput();
+            timer += Time.deltaTime;
+            if (timer >= moveRate)
+            {
+                Move();
+                timer = 0;
+            }
         }
     }
 
     private void HandleInput()
     {
-        if (Input.GetKeyDown(KeyCode.UpArrow) && direction != Vector2.down)
+        Vector2 inputDirection = MoveAction.action.ReadValue<Vector2>();
+
+        if (inputDirection.y > 0 && direction != Vector2.down)
             direction = Vector2.up;
-        else if (Input.GetKeyDown(KeyCode.DownArrow) && direction != Vector2.up)
+        else if (inputDirection.y < 0 && direction != Vector2.up)
             direction = Vector2.down;
-        else if (Input.GetKeyDown(KeyCode.LeftArrow) && direction != Vector2.right)
+        else if (inputDirection.x < 0 && direction != Vector2.right)
             direction = Vector2.left;
-        else if (Input.GetKeyDown(KeyCode.RightArrow) && direction != Vector2.left)
+        else if (inputDirection.x > 0 && direction != Vector2.left)
             direction = Vector2.right;
     }
 
